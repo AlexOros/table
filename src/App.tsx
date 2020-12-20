@@ -1,24 +1,43 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import CustomTable from "./components/CustomTable";
+import makeData from "./makeData";
 
 function App() {
+  const columns = React.useMemo(() => {
+    const col = [
+      {
+        Header: "First Name",
+        accessor: "firstName"
+      },
+      {
+        Header: "Last Name",
+        accessor: "lastName"
+      },
+      {
+        Header: "Age",
+        accessor: "age"
+      },
+      {
+        Header: "Visits",
+        accessor: "visits"
+      },
+      {
+        Header: "Status",
+        accessor: "status"
+      },
+      {
+        Header: "Profile Progress",
+        accessor: "progress"
+      }
+    ];
+    return col.map(column => ({ ...column, dataType: "number" }));
+  }, []);
+
+  const data = React.useMemo(() => makeData(20), []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <CustomTable columns={columns} data={data} />
     </div>
   );
 }
