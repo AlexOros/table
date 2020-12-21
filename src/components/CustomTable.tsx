@@ -5,7 +5,7 @@ import {
   TableCell,
   TableBody,
   Table,
-  TableSortLabel
+  TablePagination
 } from "@material-ui/core";
 import React, { useMemo } from "react";
 import {
@@ -13,88 +13,113 @@ import {
   useTable,
   useSortBy,
   useFilters,
-  TableState
+  TableState,
+  usePagination,
+  useBlockLayout
 } from "react-table";
 import { CustomTableCell } from "./CustomTableCell";
 import CustomTableHeader from "./CustomTableHeader";
 import { useStyles } from "./TableStyles";
+import useFormatter, { Rule } from "./conditional-formatting/useFormatter";
 
 type TableProps = {
   data: Array<object>;
   columns: Column[];
 };
 
-const useOwnState = (state: TableState) => {
-  console.log("~ state", state);
-  return state;
-};
-
 const CustomTable: React.FC<TableProps> = ({ data, columns }) => {
   const classes = useStyles();
-
   const memoData = useMemo(() => data, [data]);
   const memoColumns = useMemo(() => columns, [columns]);
 
-  const defaultColumn = {
-    Cell: CustomTableCell,
-    className: "user",
-    style: {
-      fontWeight: "bolder"
-    }
-  };
-
-  const { getTableProps, headerGroups, rows, prepareRow } = useTable(
+  const {
+    getTableProps,
+    getTableBodyProps,
+    headerGroups,
+    prepareRow,
+    state,
+    flatRows,
+    page,
+    columns: tableColumns,
+    gotoPage
+  } = useTable(
     {
       columns: memoColumns,
       data: memoData,
-      defaultColumn,
-      useControlledState: useOwnState
+      initialState: {
+        pageSize: 10
+      }
     },
-
     useFilters,
-    useSortBy
+    useSortBy,
+    usePagination,
+    useBlockLayout
   );
+  const { formatRules, dispatchFormatRules } = useFormatter(tableColumns, page);
+
+  const { pageIndex, pageSize } = state;
+
+  const handleChangePage = (event: unknown, newPage: number) => {
+    gotoPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    gotoPage(+event.target.value);
+  };
 
   return (
-    <TableContainer>
-      <Table
-        {...getTableProps()}
-        className={classes.root}
-        size="small"
-        aria-label="a dense table"
-      >
-        <TableHead>
-          {headerGroups.map(headerGroup => (
-            <TableRow {...headerGroup.getHeaderGroupProps()}>
-              {headerGroup.headers.map(column => (
-                <TableCell {...column.getHeaderProps()}>
-                  <CustomTableHeader column={column}>
-                    {column.render("Header")}
-                  </CustomTableHeader>
-                </TableCell>
-              ))}
-            </TableRow>
-          ))}
-        </TableHead>
-        <TableBody>
-          {rows.map((row, i) => {
-            prepareRow(row);
-            return (
-              <TableRow {...row.getRowProps()}>
-                {row.cells.map(cell => {
-                  console.log("~ cell", cell);
-                  return (
-                    <TableCell {...cell.getCellProps()}>
-                      {cell.render("Cell")}
-                    </TableCell>
-                  );
-                })}
+    <>
+      <TableContainer className={classes.root}>
+        <Table {...getTableProps()} size="small" aria-label="a dense table">
+          <TableHead>
+            {headerGroups.map(headerGroup => (
+              <TableRow {...headerGroup.getHeaderGroupProps()}>
+                {headerGroup.headers.map(column => (
+                  <TableCell {...column.getHeaderProps()}>
+                    <CustomTableHeader
+                      column={column}
+                      dispatchFormatRules={dispatchFormatRules}
+                    >
+                      {column.render("Header")}
+                    </CustomTableHeader>
+                  </TableCell>
+                ))}
               </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
-    </TableContainer>
+            ))}
+          </TableHead>
+          <TableBody {...getTableBodyProps()}>
+            {page.map(row => {
+              prepareRow(row);
+              return (
+                <TableRow {...row.getRowProps()}>
+                  {row.cells.map(cell => {
+                    const rules = formatRules.getIn([cell.column.id]) ?? [];
+                    return (
+                      <TableCell {...cell.getCellProps()}>
+                        <CustomTableCell cell={cell} rules={rules}>
+                          {cell.render("Cell")}
+                        </CustomTableCell>
+                      </TableCell>
+                    );
+                  })}
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+        <TablePagination
+          rowsPerPageOptions={[]}
+          component="div"
+          count={flatRows.length}
+          rowsPerPage={pageSize}
+          page={pageIndex}
+          onChangePage={handleChangePage}
+          onChangeRowsPerPage={handleChangeRowsPerPage}
+        />
+      </TableContainer>
+    </>
   );
 };
 

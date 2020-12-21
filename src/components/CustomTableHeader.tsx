@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Dialog,
   DialogContent,
@@ -5,11 +6,33 @@ import {
   IconButton,
   TableSortLabel
 } from "@material-ui/core";
-import React from "react";
 import FilterListIcon from "@material-ui/icons/FilterList";
 
-export const CustomTableHeader: React.FC<any> = ({ column, children }) => {
+export const CustomTableHeader: React.FC<any> = ({
+  column,
+  dispatchFormatRules,
+  children
+}) => {
   const [open, setOpen] = React.useState(false);
+
+  // // TODO this works, take it from here
+  // useEffect(() => {
+  //   dispatchFormatRules({
+  //     type: "addRule",
+  //     payload: {
+  //       columnId: "firstName",
+  //       rule: {
+  //         type: "string",
+  //         title: "is text equal",
+  //         value: "alex",
+  //         backgroundColor: "orangered",
+  //         color: "white"
+  //       }
+  //     }
+  //   });
+  // }, [dispatchFormatRules]);
+
+  // console.log("~ column", column);
 
   return (
     <div>
@@ -61,7 +84,7 @@ type ColFilterProps = { column: any };
 // Define a default UI for filtering
 const DefaultColumnFilter: React.FC<ColFilterProps> = ({ column }) => {
   const { filterValue, preFilteredRows, setFilter } = column;
-  console.log("~ column", column);
+
   const count = preFilteredRows.length;
 
   return (

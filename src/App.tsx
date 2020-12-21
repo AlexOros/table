@@ -7,33 +7,39 @@ function App() {
     const col = [
       {
         Header: "First Name",
-        accessor: "firstName"
+        accessor: "firstName",
+        width: 200
       },
       {
         Header: "Last Name",
-        accessor: "lastName"
+        accessor: "lastName",
+        width: 200
       },
       {
         Header: "Age",
-        accessor: "age"
+        accessor: "age",
+        width: 80
       },
       {
         Header: "Visits",
-        accessor: "visits"
+        accessor: "visits",
+        width: 80
       },
       {
         Header: "Status",
-        accessor: "status"
+        accessor: "status",
+        width: 200
       },
       {
         Header: "Profile Progress",
-        accessor: "progress"
+        accessor: "progress",
+        width: 80
       }
     ];
     return col.map(column => ({ ...column, dataType: "number" }));
   }, []);
 
-  const data = React.useMemo(() => makeData(20), []);
+  const data = React.useMemo(() => makeData(120), []);
 
   return (
     <div>
