@@ -57,6 +57,7 @@ const CustomTable: React.FC<TableProps> = ({ data, columns }) => {
   );
   const { formatRules, dispatchFormatRules } = useFormatter(tableColumns, page);
 
+  console.log("~ page", page);
   const { pageIndex, pageSize } = state;
 
   const handleChangePage = (event: unknown, newPage: number) => {
@@ -92,13 +93,18 @@ const CustomTable: React.FC<TableProps> = ({ data, columns }) => {
           <TableBody {...getTableBodyProps()}>
             {page.map(row => {
               prepareRow(row);
+              const { cells } = row;
               return (
                 <TableRow {...row.getRowProps()}>
-                  {row.cells.map(cell => {
+                  {cells.map(cell => {
                     const rules = formatRules.getIn([cell.column.id]) ?? [];
                     return (
                       <TableCell {...cell.getCellProps()}>
-                        <CustomTableCell cell={cell} rules={rules}>
+                        <CustomTableCell
+                          cells={cells}
+                          cell={cell}
+                          rules={rules}
+                        >
                           {cell.render("Cell")}
                         </CustomTableCell>
                       </TableCell>

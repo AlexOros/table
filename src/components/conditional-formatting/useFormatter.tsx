@@ -36,11 +36,10 @@ const useFormatter = (columns: any, page: any) => {
   const [state, dispatch] = useReducer(countReducer, defaultState);
 
   useEffect(() => {
-    console.log("~ page", page); // all rows of the current page
-    page.forEach(
-      (rows: any) =>
-        rows.cells.forEach((cell: any) => console.log(cell.getCellProps())) // ???!!! here
-    );
+    // page.forEach(
+    //   (rows: any) =>
+    //     rows.cells.forEach((cell: any) => console.log(cell.getCellProps())) // ???!!! here
+    // );
 
     columns.map((column: any) =>
       dispatch({ type: "init", payload: column.columnId })
